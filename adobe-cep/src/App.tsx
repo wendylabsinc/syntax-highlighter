@@ -1,12 +1,25 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Button } from '@/components/ui/button';
-import { Combobox, type ComboboxOption } from '@/components/Combobox';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Separator } from '@/components/ui/separator';
-import { Checkbox } from '@/components/ui/checkbox';
-import { POPULAR_LANGUAGES, THEMES, DEFAULTS } from '@/lib/config';
-import { loadSettings, saveLanguage, saveTheme } from '@/lib/storage';
-import { highlightCode, type HighlightResult } from '@/lib/highlighter';
+import {
+  Button,
+  Combobox,
+  type ComboboxOption,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+  Separator,
+  Checkbox,
+} from '@syntax-highlighter/ui';
+import {
+  POPULAR_LANGUAGES,
+  THEMES,
+  DEFAULTS,
+  loadSettings,
+  saveLanguage,
+  saveTheme,
+  highlightCode,
+  type HighlightResult,
+} from '@syntax-highlighter/core';
 import {
   initCSInterface,
   getSelectedTextLayers,

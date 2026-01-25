@@ -1,14 +1,28 @@
 /// <reference types="office-js" />
 
 import { useState, useEffect, useCallback } from 'react';
-import { Button } from '@/components/ui/button';
-import { Combobox, type ComboboxOption } from '@/components/Combobox';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Separator } from '@/components/ui/separator';
-import { Checkbox } from '@/components/ui/checkbox';
-import { POPULAR_LANGUAGES, THEMES, DEFAULTS } from '@/lib/config';
-import { loadSettings, saveLanguage, saveTheme } from '@/lib/storage';
-import { highlightCode, type HighlightResult, type HighlightedToken } from '@/lib/highlighter';
+import {
+  Button,
+  Combobox,
+  type ComboboxOption,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+  Separator,
+  Checkbox,
+} from '@syntax-highlighter/ui';
+import {
+  POPULAR_LANGUAGES,
+  THEMES,
+  DEFAULTS,
+  loadSettings,
+  saveLanguage,
+  saveTheme,
+  highlightCode,
+  type HighlightResult,
+  type HighlightedToken,
+} from '@syntax-highlighter/core';
 
 type StatusType = 'info' | 'success' | 'warning' | 'error';
 
@@ -249,7 +263,7 @@ function App() {
           // Build HTML using a table (Word handles table cell backgrounds better than pre)
           let lines = '';
 
-          tokens.forEach((line, lineIndex) => {
+          tokens.forEach((line) => {
             let lineHtml = '';
             line.forEach((token) => {
               // Strip alpha from token color
