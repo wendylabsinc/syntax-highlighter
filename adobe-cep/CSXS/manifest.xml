@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ExtensionManifest Version="12.0" ExtensionBundleId="sh.wendy.syntaxhighlighter.cep" ExtensionBundleVersion="1.0.0" ExtensionBundleName="Syntax Highlighter">
+<ExtensionManifest Version="12.0" ExtensionBundleId="sh.wendy.syntaxhighlighter" ExtensionBundleVersion="1.0.0" ExtensionBundleName="Syntax Highlighter">
   <ExtensionList>
     <Extension Id="sh.wendy.syntaxhighlighter.panel" Version="1.0.0"/>
   </ExtensionList>
