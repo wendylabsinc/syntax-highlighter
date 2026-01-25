@@ -9,8 +9,8 @@ A syntax highlighting extension for Microsoft Office and Adobe Creative Cloud ap
 | Microsoft PowerPoint | Office 365 Add-in | ✅ Supported |
 | Microsoft Word | Office 365 Add-in | ✅ Supported |
 | Adobe After Effects | CEP Panel | ✅ Supported |
+| Adobe Illustrator | CEP Panel | ✅ Supported |
 | Adobe Premiere Pro | CEP Panel | 🔄 Planned |
-| Adobe Illustrator | CEP Panel | 🔄 Planned |
 | Adobe Photoshop | CEP Panel | 🔄 Planned |
 | Adobe InDesign | CEP Panel | 🔄 Planned |
 
@@ -24,32 +24,41 @@ A syntax highlighting extension for Microsoft Office and Adobe Creative Cloud ap
 
 ## Project Structure
 
+This is a monorepo with shared packages to eliminate code duplication:
+
 ```
 syntax-highlighter/
-├── office-365/          # Microsoft Office Add-in (Word & PowerPoint)
-│   ├── src/             # React + TypeScript source
-│   ├── manifest.xml     # Office Add-in manifest
-│   └── package.json
+├── packages/
+│   ├── core/                # @syntax-highlighter/core
+│   │   └── src/
+│   │       ├── config.ts    # Themes, languages, defaults
+│   │       ├── highlighter.ts # Shiki integration
+│   │       └── storage.ts   # localStorage helpers
+│   │
+│   └── ui/                  # @syntax-highlighter/ui
+│       └── src/
+│           ├── components/  # Shared React components (shadcn/ui)
+│           └── utils.ts     # cn() utility
 │
-├── adobe-cep/           # Adobe CEP Panel (After Effects, Premiere, etc.)
-│   ├── src/             # React + TypeScript source
-│   ├── jsx/             # ExtendScript for Adobe apps
-│   ├── CSXS/            # CEP manifest
-│   └── package.json
+├── office-365/              # Microsoft Office Add-in (Word & PowerPoint)
+│   ├── src/
+│   │   └── App.tsx          # Office.js integration
+│   └── manifest.xml         # Office Add-in manifest
 │
-└── adobe-uxp/           # Adobe UXP Plugin (Photoshop 2021+, future apps)
-    ├── src/             # TypeScript source
-    ├── manifest.json    # UXP manifest
-    └── package.json
+└── adobe-cep/               # Adobe CEP Panel (After Effects, Illustrator, etc.)
+    ├── src/
+    │   ├── App.tsx          # CEP panel UI
+    │   └── lib/cep.ts       # CSInterface wrapper
+    ├── jsx/host.jsx         # ExtendScript for Adobe apps
+    └── CSXS/manifest.xml    # CEP manifest
 ```
 
-### Why Multiple Projects?
+### Why Shared Packages?
 
-- **Office 365** uses the Office JavaScript API and runs as a web-based add-in
-- **Adobe CEP** uses ExtendScript and the CEP (Common Extensibility Platform) framework for legacy Adobe apps
-- **Adobe UXP** uses the newer Unified eXtensibility Platform for Photoshop 2021+ and future Adobe apps
+- **@syntax-highlighter/core** - Contains Shiki highlighter, theme/language configs, and storage utilities shared by all apps
+- **@syntax-highlighter/ui** - Contains React components (Button, Combobox, Accordion, etc.) used across all apps
 
-While they share similar UI patterns, the underlying APIs are completely different, so they're maintained as separate packages.
+The platform-specific code (Office.js API, CEP/ExtendScript) remains in their respective app folders.
 
 ---
 
@@ -58,26 +67,45 @@ While they share similar UI patterns, the underlying APIs are completely differe
 ### Prerequisites
 
 - Node.js 18+
-- npm or yarn
+- npm 7+ (for workspaces support)
 - For Adobe: Creative Cloud apps with CEP debugging enabled
 - For Office: Microsoft 365 subscription
+
+### Install Dependencies
+
+From the repository root:
+
+```bash
+npm install
+```
+
+This installs dependencies for all packages and apps, and links the shared packages.
+
+### Build Commands
+
+```bash
+# Build everything
+npm run build
+
+# Build only shared packages
+npm run build:packages
+
+# Build only Office 365 add-in
+npm run build:office
+
+# Build only Adobe CEP panel
+npm run build:cep
+```
 
 ---
 
 ## Microsoft Office (Word & PowerPoint)
 
-### Setup
-
-```bash
-cd office-365
-npm install
-```
-
 ### Development
 
 1. Start the dev server with HTTPS:
    ```bash
-   npm run dev
+   npm run dev:office
    ```
    This starts Vite on `https://localhost:3000`
 
@@ -85,6 +113,7 @@ npm install
 
 3. Sideload the add-in:
    ```bash
+   cd office-365
    npm start
    ```
    Or manually: In Word/PowerPoint → Insert → Add-ins → My Add-ins → Upload My Add-in → select `manifest.xml`
@@ -111,21 +140,14 @@ npm install
 ### Build for Production
 
 ```bash
-npm run build
+npm run build:office
 ```
 
-Output is in the `dist/` folder.
+Output is in `office-365/dist/`.
 
 ---
 
 ## Adobe After Effects
-
-### Setup
-
-```bash
-cd adobe-cep
-npm install
-```
 
 ### Enable CEP Debug Mode
 
@@ -147,19 +169,19 @@ Note: Replace `CSXS.11` with the version matching your Adobe CC apps.
 
 1. Build the extension:
    ```bash
-   npm run build
+   npm run build:cep
    ```
 
 2. Create a symlink to the extensions folder:
 
    **macOS:**
    ```bash
-   ln -s "$(pwd)" "$HOME/Library/Application Support/Adobe/CEP/extensions/sh.wendy.syntaxhighlighter.cep"
+   ln -s "$(pwd)/adobe-cep" "$HOME/Library/Application Support/Adobe/CEP/extensions/sh.wendy.syntaxhighlighter.cep"
    ```
 
    **Windows:**
    ```cmd
-   mklink /D "%APPDATA%\Adobe\CEP\extensions\sh.wendy.syntaxhighlighter.cep" "%cd%"
+   mklink /D "%APPDATA%\Adobe\CEP\extensions\sh.wendy.syntaxhighlighter.cep" "%cd%\adobe-cep"
    ```
 
 3. Restart After Effects
@@ -179,19 +201,9 @@ Note: Replace `CSXS.11` with the version matching your Adobe CC apps.
 
 ---
 
-## Adobe Premiere Pro
-
-The CEP panel is compatible with Premiere Pro but text layer support is limited. The extension will detect the host app and show "PR" badge.
-
-Setup is the same as After Effects - the symlinked extension folder is shared.
-
----
-
 ## Adobe Illustrator
 
-### Setup
-
-Same as After Effects - use the shared CEP extension folder.
+The CEP panel is also available in Illustrator. Setup is the same as After Effects - the symlinked extension folder is shared.
 
 ### Testing in Illustrator
 
@@ -205,44 +217,15 @@ Note: Illustrator support requires implementing the appropriate ExtendScript in 
 
 ---
 
-## Adobe Photoshop
+## Adobe Premiere Pro / Photoshop / InDesign
 
-### Setup
-
-Same as After Effects - use the shared CEP extension folder.
-
-### Testing in Photoshop
-
-1. Create a text layer with code
-2. Select the text layer
-3. Open Window → Extensions → Syntax Highlighter
-4. Choose language and theme
-5. Click "Highlight Selection"
-
-Note: Photoshop support requires implementing the appropriate ExtendScript in `jsx/host.jsx`.
-
----
-
-## Adobe InDesign
-
-### Setup
-
-Same as After Effects - use the shared CEP extension folder.
-
-### Testing in InDesign
-
-1. Create a text frame with code
-2. Select the text frame
-3. Open Window → Extensions → Syntax Highlighter
-4. Choose language and theme
-5. Click "Highlight Selection"
-
-Note: InDesign support requires implementing the appropriate ExtendScript in `jsx/host.jsx`.
+The CEP manifest includes these apps, but ExtendScript implementation is pending. The panel will load but highlighting won't work until `jsx/host.jsx` is extended.
 
 ---
 
 ## Tech Stack
 
+- **Monorepo:** npm workspaces
 - **UI Framework:** React 19
 - **Build Tool:** Vite 7
 - **Styling:** Tailwind CSS + shadcn/ui
