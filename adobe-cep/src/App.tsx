@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Combobox, type ComboboxOption } from '@/components/Combobox';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Separator } from '@/components/ui/separator';
+import { Checkbox } from '@/components/ui/checkbox';
 import { POPULAR_LANGUAGES, THEMES, DEFAULTS } from '@/lib/config';
 import { loadSettings, saveLanguage, saveTheme } from '@/lib/storage';
 import { highlightCode, type HighlightResult } from '@/lib/highlighter';
@@ -26,6 +29,7 @@ function App() {
   const [hostApp, setHostApp] = useState('');
   const [isInitialized, setIsInitialized] = useState(false);
   const [debugLog, setDebugLog] = useState<string[]>([]);
+  const [applyFontStyles, setApplyFontStyles] = useState(false);
 
   const addDebug = useCallback((msg: string) => {
     setDebugLog((prev) => [...prev, msg]);
@@ -124,6 +128,7 @@ function App() {
             tokens: highlightResult.tokens,
             backgroundColor: highlightResult.backgroundColor,
             foregroundColor: highlightResult.foregroundColor,
+            applyFontStyles,
           });
 
           if (applyResult.debug) {
@@ -222,6 +227,21 @@ function App() {
         />
       </div>
 
+      {/* Font Styles Toggle */}
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="fontStyles"
+          checked={applyFontStyles}
+          onCheckedChange={(checked) => setApplyFontStyles(checked === true)}
+        />
+        <label
+          htmlFor="fontStyles"
+          className="text-[10px] text-muted-foreground cursor-pointer"
+        >
+          Apply bold/italic from theme
+        </label>
+      </div>
+
       {/* Highlight Button */}
       <Button
         onClick={handleHighlight}
@@ -248,8 +268,7 @@ function App() {
         </div>
       )}
 
-      {/* Divider */}
-      <div className="h-px bg-border" />
+      <Separator />
 
       {/* Help Text */}
       <div className="text-[9px] text-muted-foreground leading-relaxed">
@@ -264,26 +283,36 @@ function App() {
         4. Click "Highlight Selection"
       </div>
 
-      {/* Debug Section */}
-      <div className="space-y-2">
-        <div className="h-px bg-border" />
-        <Button
-          variant="secondary"
-          onClick={copyDebugLog}
-          className="w-full h-6 text-[9px]"
-        >
-          Copy Debug Log
-        </Button>
-        <div className="max-h-20 overflow-y-auto text-[8px] text-muted-foreground font-mono bg-input rounded p-1.5">
-          {debugLog.length === 0 ? (
-            <span className="italic">No debug messages yet</span>
-          ) : (
-            debugLog.map((msg, i) => (
-              <div key={i}>{msg}</div>
-            ))
-          )}
-        </div>
-      </div>
+      <Separator />
+
+      {/* Debug Section with Accordion */}
+      <Accordion type="single" collapsible className="w-full">
+        <AccordionItem value="debug" className="border-none">
+          <AccordionTrigger className="text-[10px] text-muted-foreground hover:no-underline py-2">
+            Debug Log {debugLog.length > 0 && `(${debugLog.length})`}
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="space-y-2">
+              <Button
+                variant="secondary"
+                onClick={copyDebugLog}
+                className="w-full h-6 text-[9px]"
+              >
+                Copy Debug Log
+              </Button>
+              <div className="max-h-24 overflow-y-auto text-[8px] text-muted-foreground font-mono bg-muted rounded p-1.5">
+                {debugLog.length === 0 ? (
+                  <span className="italic">No debug messages yet</span>
+                ) : (
+                  debugLog.map((msg, i) => (
+                    <div key={i}>{msg}</div>
+                  ))
+                )}
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </div>
   );
 }

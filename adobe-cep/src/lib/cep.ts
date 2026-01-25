@@ -106,9 +106,10 @@ export async function getSelectedTextLayers(): Promise<GetLayersResult> {
 
 export async function applyHighlighting(data: {
   layerIndex: number;
-  tokens: Array<Array<{ content: string; style: { color: string } }>>;
+  tokens: Array<Array<{ content: string; style: { color: string; fontStyle?: string } }>>;
   backgroundColor: string;
   foregroundColor: string;
+  applyFontStyles?: boolean;
 }): Promise<ApplyResult> {
   const jsonStr = JSON.stringify(data)
     .replace(/\\/g, '\\\\')
