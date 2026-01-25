@@ -228,7 +228,7 @@ function App() {
     });
   };
 
-  // Word-specific highlighting (OOXML)
+  // Word-specific highlighting (HTML insertion)
   const highlightWord = async (
     tokens: HighlightedToken[][],
     backgroundColor: string,
@@ -238,57 +238,55 @@ function App() {
       Word.run(async (context) => {
         try {
           const selection = context.document.getSelection();
-          selection.load('text');
-          await context.sync();
+          addDebug('Word: Getting selection...');
 
-          if (!selection.text || !selection.text.trim()) {
-            resolve({ success: false, message: 'No text selected. Please select some text first.' });
-            return;
+          // Strip alpha from background color
+          let bgColor = backgroundColor;
+          if (bgColor.startsWith('#') && bgColor.length === 9) {
+            bgColor = bgColor.substring(0, 7); // #RRGGBBAA -> #RRGGBB
           }
 
-          // Create OOXML runs
-          let runs = '';
-          tokens.forEach((line, lineIndex) => {
-            line.forEach((token) => {
-              const color = token.style.color.replace('#', '');
-              const isBold = includeFontStyles && token.style.fontStyle?.includes('bold') ? '<w:b/>' : '';
-              const isItalic = includeFontStyles && token.style.fontStyle?.includes('italic') ? '<w:i/>' : '';
+          // Build HTML using a table (Word handles table cell backgrounds better than pre)
+          let lines = '';
 
-              // Escape XML special characters
+          tokens.forEach((line, lineIndex) => {
+            let lineHtml = '';
+            line.forEach((token) => {
+              // Strip alpha from token color
+              let color = token.style.color;
+              if (color.startsWith('#') && color.length === 9) {
+                color = color.substring(0, 7);
+              }
+
+              const bold = includeFontStyles && token.style.fontStyle?.includes('bold') ? 'font-weight: bold;' : '';
+              const italic = includeFontStyles && token.style.fontStyle?.includes('italic') ? 'font-style: italic;' : '';
+
+              // Escape HTML special characters
               const content = token.content
                 .replace(/&/g, '&amp;')
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&apos;');
+                .replace(/ /g, '&nbsp;'); // Preserve spaces
 
-              runs += `<w:r><w:rPr><w:color w:val="${color}"/>${isBold}${isItalic}</w:rPr><w:t xml:space="preserve">${content}</w:t></w:r>`;
+              lineHtml += `<span style="color: ${color}; ${bold} ${italic}">${content}</span>`;
             });
 
-            if (lineIndex < tokens.length - 1) {
-              runs += '<w:r><w:br/></w:r>';
-            }
+            lines += `<p style="margin: 0; line-height: 1.4;">${lineHtml || '&nbsp;'}</p>`;
           });
 
-          const bgColor = backgroundColor.replace('#', '');
-          const ooxml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-            <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-              <w:body>
-                <w:p>
-                  <w:pPr>
-                    <w:shd w:val="clear" w:color="auto" w:fill="${bgColor}"/>
-                  </w:pPr>
-                  ${runs}
-                </w:p>
-              </w:body>
-            </w:document>`;
+          const html = `<table style="border-collapse: collapse; width: 100%;"><tr><td style="background-color: ${bgColor}; padding: 12px; font-family: Consolas, Monaco, 'Courier New', monospace; font-size: 11pt;">${lines}</td></tr></table>`;
 
-          selection.insertOoxml(ooxml, Word.InsertLocation.replace);
+          addDebug(`Word: Created HTML with ${tokens.flat().length} spans`);
+          addDebug('Word: Inserting HTML...');
+
+          selection.insertHtml(html, Word.InsertLocation.replace);
           await context.sync();
+          addDebug('Word: HTML inserted successfully');
 
           resolve({ success: true, message: 'Code highlighted successfully!' });
         } catch (error) {
           const message = error instanceof Error ? error.message : 'Unknown error';
+          addDebug(`Word error: ${message}`);
           resolve({ success: false, message });
         }
       });
