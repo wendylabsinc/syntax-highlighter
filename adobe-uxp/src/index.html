@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Syntax Highlighter</title>
+  <style>
+    :root {
+      --bg-color: #2d2d2d;
+      --text-color: #e0e0e0;
+      --border-color: #444;
+      --accent-color: #0d99ff;
+      --hover-color: #3d3d3d;
+      --success-color: #4caf50;
+      --warning-color: #ff9800;
+      --error-color: #f44336;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 12px;
+      background: var(--bg-color);
+      color: var(--text-color);
+      padding: 12px;
+      min-height: 100vh;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    h1 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      color: #888;
+      font-size: 11px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #aaa;
+    }
+
+    select {
+      width: 100%;
+      padding: 8px 12px;
+      font-size: 12px;
+      background: #1a1a1a;
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+
+    select:hover {
+      border-color: var(--accent-color);
+    }
+
+    select:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 2px rgba(13, 153, 255, 0.2);
+    }
+
+    optgroup {
+      font-weight: 600;
+      color: #888;
+    }
+
+    option {
+      padding: 4px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: white;
+      background: var(--accent-color);
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #0b87e0;
+    }
+
+    button:active {
+      background: #0a75c4;
+    }
+
+    button:disabled {
+      background: #555;
+      cursor: not-allowed;
+    }
+
+    .status {
+      padding: 10px 12px;
+      border-radius: 4px;
+      font-size: 11px;
+      line-height: 1.4;
+      display: none;
+    }
+
+    .status.visible {
+      display: block;
+    }
+
+    .status.info {
+      background: rgba(13, 153, 255, 0.15);
+      border: 1px solid rgba(13, 153, 255, 0.3);
+      color: #5bb9ff;
+    }
+
+    .status.success {
+      background: rgba(76, 175, 80, 0.15);
+      border: 1px solid rgba(76, 175, 80, 0.3);
+      color: #81c784;
+    }
+
+    .status.warning {
+      background: rgba(255, 152, 0, 0.15);
+      border: 1px solid rgba(255, 152, 0, 0.3);
+      color: #ffb74d;
+    }
+
+    .status.error {
+      background: rgba(244, 67, 54, 0.15);
+      border: 1px solid rgba(244, 67, 54, 0.3);
+      color: #e57373;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border-color);
+      margin: 4px 0;
+    }
+
+    .help-text {
+      font-size: 10px;
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .selection-info {
+      padding: 8px;
+      background: #1a1a1a;
+      border-radius: 4px;
+      font-size: 11px;
+      color: #888;
+    }
+
+    .selection-info strong {
+      color: var(--text-color);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div>
+      <h1>Syntax Highlighter</h1>
+      <p class="subtitle">Highlight code in selected text layers</p>
+    </div>
+
+    <div class="form-group">
+      <label for="language">Language</label>
+      <select id="language">
+        <option value="auto">Auto Detect</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="theme">Theme</label>
+      <select id="theme">
+        <optgroup label="Dark Themes" id="dark-themes"></optgroup>
+        <optgroup label="Light Themes" id="light-themes"></optgroup>
+      </select>
+    </div>
+
+    <button id="highlight-btn">Highlight Selection</button>
+
+    <div id="status" class="status"></div>
+
+    <div class="divider"></div>
+
+    <div class="help-text">
+      <strong>How to use:</strong><br>
+      1. Select one or more text layers<br>
+      2. Choose a language (or use Auto)<br>
+      3. Pick a color theme<br>
+      4. Click "Highlight Selection"
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

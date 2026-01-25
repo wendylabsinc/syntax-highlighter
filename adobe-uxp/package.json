@@ -1,0 +1,19 @@
+{
+  "name": "syntax-highlighter-uxp",
+  "version": "1.0.0",
+  "description": "Syntax Highlighter for Adobe Creative Cloud apps using ShikiJS",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc && node build.js",
+    "watch": "tsc --watch & node build.js --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "shiki": "^3.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "esbuild": "^0.20.0",
+    "typescript": "^5.3.0"
+  }
+}

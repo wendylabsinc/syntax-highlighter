@@ -1,0 +1,70 @@
+{
+  "manifestVersion": 6,
+  "id": "sh.wendy.syntaxhighlighter",
+  "name": "Syntax Highlighter",
+  "version": "1.0.0",
+  "main": "dist/index.html",
+  "host": [
+    {
+      "app": "PS",
+      "minVersion": "24.0.0"
+    },
+    {
+      "app": "ID",
+      "minVersion": "18.0.0"
+    },
+    {
+      "app": "AI",
+      "minVersion": "27.0.0"
+    }
+  ],
+  "entrypoints": [
+    {
+      "type": "panel",
+      "id": "syntaxHighlighterPanel",
+      "label": {
+        "default": "Syntax Highlighter"
+      },
+      "minimumSize": {
+        "width": 280,
+        "height": 400
+      },
+      "maximumSize": {
+        "width": 600,
+        "height": 800
+      },
+      "preferredDockedSize": {
+        "width": 320,
+        "height": 450
+      },
+      "preferredFloatingSize": {
+        "width": 320,
+        "height": 450
+      },
+      "icons": [
+        {
+          "width": 24,
+          "height": 24,
+          "path": "icons/icon-24.png",
+          "scale": [1, 2],
+          "theme": ["darkest", "dark", "medium", "lightest", "light"]
+        }
+      ]
+    }
+  ],
+  "requiredPermissions": {
+    "localFileSystem": "fullAccess",
+    "network": {
+      "domains": ["https://unpkg.com", "https://esm.sh"]
+    }
+  },
+  "icons": [
+    {
+      "width": 48,
+      "height": 48,
+      "path": "icons/icon-48.png",
+      "scale": [1, 2],
+      "theme": ["darkest", "dark", "medium", "lightest", "light"]
+    }
+  ]
+}
