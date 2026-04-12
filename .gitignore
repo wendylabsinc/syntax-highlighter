@@ -2,7 +2,7 @@
 node_modules/
 
 # Build outputs
-dist/
+ui/dist/
 build/
 
 # IDE
@@ -22,6 +22,3 @@ npm-debug.log*
 
 # TypeScript
 *.tsbuildinfo
-
-# Package manager locks (optional - uncomment if you want to ignore)
-# package-lock.json

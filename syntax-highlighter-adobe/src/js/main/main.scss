@@ -1,0 +1,104 @@
+@use "../variables.scss" as *;
+
+.app {
+  min-height: 100vh;
+  color: $font;
+  display: flex;
+  justify-content: center;
+  padding: 1.25rem 1rem;
+  box-sizing: border-box;
+}
+
+.panel {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.title {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: white;
+  letter-spacing: 0.01em;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.field-label {
+  font-size: 0.8rem;
+  color: $font;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  background-color: $darker;
+  color: white;
+  border: 1px solid $dark;
+  border-radius: 4px;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.85rem;
+  outline: none;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $highlight;
+  }
+
+  &:focus {
+    border-color: $active;
+  }
+}
+
+.action {
+  margin-top: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.primary {
+  background-color: $active;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.55rem 1.1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-width: 160px;
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.1);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+}
+
+.text-sm {
+  font-size: 0.8rem;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.hint {
+  color: $font;
+}
+
+.status {
+  color: $changed;
+}
