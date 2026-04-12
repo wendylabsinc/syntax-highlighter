@@ -1,3 +1,4 @@
+import InstallInstructions from '@/components/sections/install-instructions';
 import MetafiCta from '@/components/sections/matafi-cta';
 import MetafiFaq from '@/components/sections/metafi-faq';
 import MetafiFeatures from '@/components/sections/metafi-features';
@@ -8,6 +9,7 @@ export default function Home() {
     <>
       <MetafiHero />
       <MetafiFeatures />
+      <InstallInstructions />
       <MetafiFaq />
       <MetafiCta />
     </>
