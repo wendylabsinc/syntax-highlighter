@@ -5,7 +5,7 @@
     "strict": true,
     "types": [
       "../global",
-      "../../../node_modules/types-for-adobe/Illustrator/2015.3",
+      "../../../node_modules/types-for-adobe/Illustrator/2022",
       "../../../node_modules/types-for-adobe/shared/PlugPlugExternalObject"
     ]
   },

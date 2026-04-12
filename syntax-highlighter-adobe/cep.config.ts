@@ -44,8 +44,8 @@ const config: CEP_Config = {
   zxp: {
     country: "US",
     province: "CA",
-    org: "Company",
-    password: "password",
+    org: "Wendy Labs",
+    password: "syntax-highlighter",
     tsa: [
       "http://timestamp.digicert.com/", // Windows Only
       "http://timestamp.apple.com/ts01", // MacOS Only
