@@ -17,6 +17,8 @@ import type {
 
 const DEFAULT_LANGUAGE: BundledLanguage = "typescript";
 const DEFAULT_THEME: BundledTheme = "github-dark";
+const LS_KEY_LANG = "sh.syntax-highlighter.language";
+const LS_KEY_THEME = "sh.syntax-highlighter.theme";
 
 /** Parse a shiki "#rrggbb" or "#rrggbbaa" hex string into AE's 0..1 RGB. */
 const hexToAEColor = (hex: string | undefined): AEColor | undefined => {
@@ -38,10 +40,25 @@ const sortedThemes = [...bundledThemesInfo].sort((a, b) =>
   a.displayName.localeCompare(b.displayName),
 );
 
+const languageIds = new Set(sortedLanguages.map((l) => l.id));
+const themeIds = new Set(sortedThemes.map((t) => t.id));
+
+const loadCached = <T extends string>(key: string, valid: Set<string>, fallback: T): T => {
+  try {
+    const v = localStorage.getItem(key);
+    if (v && valid.has(v)) return v as T;
+  } catch {}
+  return fallback;
+};
+
 export const App = () => {
   const [bgColor, setBgColor] = useState("#282c34");
-  const [language, setLanguage] = useState<BundledLanguage>(DEFAULT_LANGUAGE);
-  const [theme, setTheme] = useState<BundledTheme>(DEFAULT_THEME);
+  const [language, setLanguage] = useState<BundledLanguage>(
+    loadCached(LS_KEY_LANG, languageIds, DEFAULT_LANGUAGE),
+  );
+  const [theme, setTheme] = useState<BundledTheme>(
+    loadCached(LS_KEY_THEME, themeIds, DEFAULT_THEME),
+  );
   const [formatting, setFormatting] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
 
@@ -67,7 +84,8 @@ export const App = () => {
       const updates: LayerHighlight[] = [];
       for (const layer of selectionAndTexts) {
         if (!layer.text) continue;
-        const result = await codeToTokens(layer.text, {
+        // AE text layers use \r for line breaks; shiki grammars expect \n.
+        const result = await codeToTokens(layer.text.replace(/\r/g, "\n"), {
           lang: language,
           theme,
         });
@@ -126,7 +144,11 @@ export const App = () => {
           <select
             className="select"
             value={language}
-            onChange={(e) => setLanguage(e.target.value as BundledLanguage)}
+            onChange={(e) => {
+              const v = e.target.value as BundledLanguage;
+              setLanguage(v);
+              try { localStorage.setItem(LS_KEY_LANG, v); } catch {}
+            }}
           >
             {sortedLanguages.map((info) => (
               <option key={info.id} value={info.id}>
@@ -141,7 +163,11 @@ export const App = () => {
           <select
             className="select"
             value={theme}
-            onChange={(e) => setTheme(e.target.value as BundledTheme)}
+            onChange={(e) => {
+              const v = e.target.value as BundledTheme;
+              setTheme(v);
+              try { localStorage.setItem(LS_KEY_THEME, v); } catch {}
+            }}
           >
             {sortedThemes.map((info) => (
               <option key={info.id} value={info.id}>
