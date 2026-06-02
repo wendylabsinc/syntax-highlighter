@@ -24,9 +24,24 @@
   letter-spacing: 0;
 }
 
+.brand {
+  min-width: 0;
+}
+
 .toolbar h1 {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
   font-size: 1.05rem;
   font-weight: 650;
+}
+
+.brand-logo {
+  display: block;
+  width: 5.75rem;
+  height: auto;
+  flex: 0 0 auto;
 }
 
 .toolbar p {
@@ -109,7 +124,7 @@
 
 .preview-tools {
   display: grid;
-  grid-template-columns: minmax(8rem, 1fr) auto;
+  grid-template-columns: minmax(8rem, auto) minmax(0, 1fr);
   gap: 0.75rem 1rem;
   align-items: center;
   padding: 0.75rem 1rem;
@@ -135,6 +150,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 0.5rem;
   min-width: 0;
 }
@@ -282,6 +298,10 @@
 
   .toolbar {
     align-items: start;
+  }
+
+  .toolbar h1 {
+    flex-wrap: wrap;
   }
 
   .controls {

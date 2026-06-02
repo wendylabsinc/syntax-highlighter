@@ -29,6 +29,13 @@ import { Slider } from '@/components/ui/slider'
 import { ClipboardIcon, DownloadIcon } from 'lucide-react'
 import './App.css'
 
+const WENDY_LOGO_SRC = new URL('./assets/wendy-logo.svg', import.meta.url).href
+
+const LANGUAGE_STORAGE_KEY = 'wendy-syntax-highlighter-language'
+const THEME_STORAGE_KEY = 'wendy-syntax-highlighter-theme'
+const DEFAULT_LANGUAGE: BundledLanguage = 'typescript'
+const DEFAULT_THEME: BundledTheme = 'github-light'
+
 type SelectOption = {
   value: string
   label: string
@@ -41,7 +48,7 @@ type FontOption = SelectOption & {
 
 const DEFAULT_CODE = `type HighlightRequest = {
   language: 'typescript'
-  theme: 'github-dark'
+  theme: 'github-light'
   code: string
 }
 
@@ -63,6 +70,7 @@ const DEFAULT_PREVIEW_BACKGROUND = true
 const DEFAULT_PREVIEW_BACKGROUND_COLOR = '#f4f4f5'
 const DEFAULT_PREVIEW_BOUNDING_BOX = true
 const DEFAULT_PREVIEW_FIT = true
+const DEFAULT_EXPORT_BACKGROUND = false
 const PREVIEW_FIT_MARGIN = 32
 
 const languageOptions = [...bundledLanguagesInfo]
@@ -96,6 +104,40 @@ const fontOptions: FontOption[] = [
       '"Inconsolata", "SFMono-Regular", "SF Mono", Consolas, "Liberation Mono", Menlo, monospace',
   },
 ]
+
+function isBundledLanguage(value: string | null): value is BundledLanguage {
+  return Boolean(value && languageOptions.some((option) => option.value === value))
+}
+
+function isBundledTheme(value: string | null): value is BundledTheme {
+  return Boolean(value && themeOptions.some((option) => option.value === value))
+}
+
+function readStoredLanguage() {
+  try {
+    const storedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY)
+    return isBundledLanguage(storedLanguage) ? storedLanguage : DEFAULT_LANGUAGE
+  } catch {
+    return DEFAULT_LANGUAGE
+  }
+}
+
+function readStoredTheme() {
+  try {
+    const storedTheme = localStorage.getItem(THEME_STORAGE_KEY)
+    return isBundledTheme(storedTheme) ? storedTheme : DEFAULT_THEME
+  } catch {
+    return DEFAULT_THEME
+  }
+}
+
+function writeStoredValue(key: string, value: string) {
+  try {
+    localStorage.setItem(key, value)
+  } catch {
+    // Ignore storage failures so highlighting remains usable in restricted tabs.
+  }
+}
 
 function ShikiCombobox({
   label,
@@ -230,8 +272,8 @@ function PreviewToggle({
 
 function App() {
   const [code, setCode] = useState(DEFAULT_CODE)
-  const [language, setLanguage] = useState<BundledLanguage>('typescript')
-  const [theme, setTheme] = useState<BundledTheme>('github-dark')
+  const [language, setLanguage] = useState<BundledLanguage>(readStoredLanguage)
+  const [theme, setTheme] = useState<BundledTheme>(readStoredTheme)
   const [html, setHtml] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [actionStatus, setActionStatus] = useState<string | null>(null)
@@ -253,6 +295,9 @@ function App() {
     DEFAULT_PREVIEW_BOUNDING_BOX,
   )
   const [fitPreview, setFitPreview] = useState(DEFAULT_PREVIEW_FIT)
+  const [exportBackground, setExportBackground] = useState(
+    DEFAULT_EXPORT_BACKGROUND,
+  )
   const [previewZoom, setPreviewZoom] = useState(1)
   const previewRef = useRef<HTMLDivElement | null>(null)
   const exportSurfaceRef = useRef<HTMLDivElement | null>(null)
@@ -264,6 +309,14 @@ function App() {
   const editorTheme = selectedTheme?.type === 'light' ? 'light' : 'dark'
   const selectedFont =
     fontOptions.find((option) => option.value === exportFont) ?? fontOptions[0]
+
+  useEffect(() => {
+    writeStoredValue(LANGUAGE_STORAGE_KEY, language)
+  }, [language])
+
+  useEffect(() => {
+    writeStoredValue(THEME_STORAGE_KEY, theme)
+  }, [theme])
 
   useEffect(() => {
     let cancelled = false
@@ -362,6 +415,11 @@ function App() {
     setFitPreview(checked)
   }
 
+  const handleExportBackgroundChange = (checked: boolean) => {
+    setActionStatus(null)
+    setExportBackground(checked)
+  }
+
   const createPngBlob = async () => {
     if (!exportSurfaceRef.current) {
       throw new Error('Preview surface is not ready')
@@ -370,6 +428,10 @@ function App() {
     await document.fonts?.load(`${exportFontSize}px "${selectedFont.label}"`)
     await document.fonts?.ready
 
+    const pngBackgroundColor = exportBackground
+      ? previewBackgroundColor
+      : 'transparent'
+
     const blob = await toBlob(exportSurfaceRef.current, {
       cacheBust: true,
       pixelRatio: 1,
@@ -377,11 +439,11 @@ function App() {
       height: exportHeight,
       canvasWidth: exportWidth,
       canvasHeight: exportHeight,
-      backgroundColor: 'transparent',
+      backgroundColor: pngBackgroundColor,
       style: {
         width: `${exportWidth}px`,
         height: `${exportHeight}px`,
-        background: 'transparent',
+        background: pngBackgroundColor,
         fontSize: `${exportFontSize}px`,
         fontFamily: selectedFont.family,
       },
@@ -439,6 +501,7 @@ function App() {
     padding: `${exportPadding}px`,
     fontSize: `${exportFontSize}px`,
     fontFamily: selectedFont.family,
+    background: exportBackground ? previewBackgroundColor : 'transparent',
   }
   const previewScale = fitPreview ? previewZoom : 1
   const previewStageStyle = {
@@ -457,8 +520,16 @@ function App() {
   return (
     <main className="workspace">
       <header className="toolbar">
-        <div>
-          <h1>Wendy Syntax Highlighter</h1>
+        <div className="brand">
+          <h1 aria-label="Wendy Syntax Highlighter">
+            <img
+              aria-hidden="true"
+              className="brand-logo"
+              src={WENDY_LOGO_SRC}
+              alt=""
+            />
+            <span>Syntax Highlighter</span>
+          </h1>
           <p>{error ?? actionStatus ?? 'Ready'}</p>
         </div>
         <div className="controls">
@@ -525,6 +596,12 @@ function App() {
                 checked={fitPreview}
                 onCheckedChange={handleFitPreviewChange}
               />
+              <PreviewToggle
+                id="export-background"
+                label="Export Background"
+                checked={exportBackground}
+                onCheckedChange={handleExportBackgroundChange}
+              />
               <Button
                 type="button"
                 variant="outline"
@@ -551,8 +628,8 @@ function App() {
               <label className="control background-color-control">
                 <span>Background</span>
                 <ColorPicker
-                  disabled={!previewBackground}
-                  label="Preview background color"
+                  disabled={!previewBackground && !exportBackground}
+                  label="Background color"
                   value={previewBackgroundColor}
                   onValueChange={handlePreviewBackgroundColorChange}
                 />
