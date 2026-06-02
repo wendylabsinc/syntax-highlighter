@@ -1,0 +1,14 @@
+{
+  "name": "@syntax-highlighter/shared",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./panel.css": "./src/panel.css"
+  },
+  "peerDependencies": {
+    "react": "^19.1.0",
+    "shiki": "^4.0.2"
+  }
+}

@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "lib": ["DOM", "DOM.Iterable", "ES2020"],
     "allowJs": false,
     "skipLibCheck": true,
-    "esModuleInterop": false,
+    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
@@ -16,14 +16,13 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "types": ["office-js", "node"],
     "paths": {
-      "@esTypes/*": ["./src/jsx"],
       "@syntax-highlighter/shared": ["../syntax-highlighter-shared/src/index.ts"],
       "react": ["./node_modules/@types/react/index.d.ts"],
       "react/jsx-runtime": ["./node_modules/@types/react/jsx-runtime.d.ts"],
       "shiki": ["./node_modules/shiki"]
     }
   },
-  "include": ["./src", "../syntax-highlighter-shared/src"],
-  "exclude": ["./src/jsx"]
+  "include": ["./src", "../syntax-highlighter-shared/src", "./vite.config.ts"]
 }

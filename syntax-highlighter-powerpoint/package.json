@@ -1,0 +1,29 @@
+{
+  "name": "sh.wendy.syntax-highlighter-powerpoint",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "dev:certs": "office-addin-dev-certs install",
+    "sideload:mac": "mkdir -p \"$HOME/Library/Containers/com.microsoft.Powerpoint/Data/Documents/wef\" && cp manifest.xml \"$HOME/Library/Containers/com.microsoft.Powerpoint/Data/Documents/wef/sh.wendy.syntax-highlighter.powerpoint.xml\""
+  },
+  "dependencies": {
+    "@syntax-highlighter/shared": "file:../syntax-highlighter-shared",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "shiki": "^4.0.2"
+  },
+  "devDependencies": {
+    "@types/office-js": "^1.0.539",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.5.1",
+    "office-addin-dev-certs": "^1.13.5",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
+  }
+}

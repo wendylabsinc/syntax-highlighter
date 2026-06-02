@@ -15,6 +15,8 @@ const cepDist = "cep";
 const src = path.resolve(__dirname, "src");
 const root = path.resolve(src, "js");
 const outDir = path.resolve(__dirname, "dist", cepDist);
+const sharedRoot = path.resolve(__dirname, "../syntax-highlighter-shared/src");
+const nodeModulesRoot = path.resolve(__dirname, "node_modules");
 
 const debugReact = process.env.DEBUG_REACT === "true";
 const isProduction = process.env.NODE_ENV === "production";
@@ -51,12 +53,24 @@ export default defineConfig({
     cep(config),
   ],
   resolve: {
-    alias: [{ find: "@esTypes", replacement: path.resolve(__dirname, "src") }],
+    alias: [
+      { find: "@esTypes", replacement: path.resolve(__dirname, "src") },
+      { find: "@syntax-highlighter/shared", replacement: sharedRoot },
+      { find: /^react$/, replacement: path.resolve(nodeModulesRoot, "react") },
+      {
+        find: /^react\/(.*)$/,
+        replacement: path.resolve(nodeModulesRoot, "react/$1"),
+      },
+      { find: /^shiki$/, replacement: path.resolve(nodeModulesRoot, "shiki/dist/index.mjs") },
+    ],
   },
   root,
   clearScreen: false,
   server: {
     port: cepConfig.port,
+    fs: {
+      allow: [path.resolve(__dirname), path.resolve(__dirname, "../syntax-highlighter-shared")],
+    },
   },
   preview: {
     port: cepConfig.servePort,

@@ -3,7 +3,11 @@
   "compilerOptions": {
     "noImplicitAny": false,
     "paths": {
-      "@esTypes/*": ["./src/js/lib/cep/es-types"]
+      "@esTypes/*": ["./src/js/lib/cep/es-types"],
+      "@syntax-highlighter/shared": ["../syntax-highlighter-shared/src/index.ts"],
+      "react": ["./node_modules/@types/react/index.d.ts"],
+      "react/jsx-runtime": ["./node_modules/@types/react/jsx-runtime.d.ts"],
+      "shiki": ["./node_modules/shiki"]
     }
   }
 }
